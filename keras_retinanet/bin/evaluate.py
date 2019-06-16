@@ -30,6 +30,7 @@ if __name__ == "__main__" and __package__ is None:
 # Change these to absolute imports if you copy this script outside the keras_retinanet package.
 from .. import models
 from ..preprocessing.csv_generator import CSVGenerator
+from ..preprocessing.kitti import KittiGenerator
 from ..preprocessing.pascal_voc import PascalVocGenerator
 from ..utils.config import read_config_file, parse_anchor_parameters
 from ..utils.eval import evaluate
@@ -74,6 +75,14 @@ def create_generator(args):
             image_max_side=args.image_max_side,
             config=args.config
         )
+    elif args.dataset_type == 'kitti':
+        validation_generator = KittiGenerator(
+            args.kitti_path,
+            subset='val',
+            image_min_side=args.image_min_side,
+            image_max_side=args.image_max_side,
+            config=args.config
+        )
     else:
         raise ValueError('Invalid data type received: {}'.format(args.dataset_type))
 
@@ -89,6 +98,9 @@ def parse_args(args):
 
     coco_parser = subparsers.add_parser('coco')
     coco_parser.add_argument('coco_path', help='Path to dataset directory (ie. /tmp/COCO).')
+
+    kitti_parser = subparsers.add_parser('kitti')
+    kitti_parser.add_argument('kitti_path', help='Path to dataset directory (ie. /tmp/kitti).')
 
     pascal_parser = subparsers.add_parser('pascal')
     pascal_parser.add_argument('pascal_path', help='Path to dataset directory (ie. /tmp/VOCdevkit).')
