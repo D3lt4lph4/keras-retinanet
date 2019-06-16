@@ -153,7 +153,7 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
 
     if args.tensorboard_dir:
         tensorboard_callback = keras.callbacks.TensorBoard(
-            log_dir                = args.tensorboard_dir,
+            log_dir                = os.path.join(os.environ["LOCAL_WORK_DIR"], args.tensorboard_dir),
             histogram_freq         = 0,
             batch_size             = args.batch_size,
             write_graph            = True,
@@ -179,6 +179,7 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
     # save the model
     if args.snapshots:
         # ensure directory created first; otherwise h5py will error after epoch.
+        args.snapshot_path = os.path.join(os.environ["LOCAL_WORK_DIR"], args.snapshot_path)
         makedirs(args.snapshot_path)
         checkpoint = keras.callbacks.ModelCheckpoint(
             os.path.join(
