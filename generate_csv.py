@@ -102,7 +102,7 @@ else:
     with open(set_path) as set_file:
         lines = set_file.read().splitlines()
 
-    with open(join(output_path, 'boxes_val.csv'), mode='w') as csv_file:
+    with open(join(output_path, 'boxes_train.csv'), mode='w') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for image_name in lines:
             filename = '{}'.format(image_name) + '.jpg'
@@ -123,10 +123,10 @@ else:
                 tag = translation[tag]
 
                 for bounding_box in object_tree.iter('bndbox'):
-                    x_min = float(bounding_box.find('xmin').text)
-                    y_min = float(bounding_box.find('ymin').text)
-                    x_max = float(bounding_box.find('xmax').text)
-                    y_max = float(bounding_box.find('ymax').text)
+                    x_min = int(bounding_box.find('xmin').text)
+                    y_min = int(bounding_box.find('ymin').text)
+                    x_max = int(bounding_box.find('xmax').text)
+                    y_max = int(bounding_box.find('ymax').text)
 
                 csv_writer.writerow([image_path, x_min, y_min, x_max, y_max, tag])
 
