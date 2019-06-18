@@ -1,5 +1,7 @@
 import argparse
 
+import random
+
 import json
 
 from os.path import join, splitext
@@ -62,8 +64,8 @@ else:
             'bus': 'Truck',
             'caravan': 'DontCare',
             'motorcycle': 'DontCare',
-            'rider': 'DontCare',
             'bicycle': 'DontCare',
+            'rider': 'DontCare',
             'trailer': 'DontCare'
         }
     else:
@@ -79,12 +81,25 @@ if args.json:
     json_path = "/save/2017018/bdegue01/datasets/GTA_dataset/bounding_box.json"
     output_path = "/save/2017018/bdegue01/datasets/GTA_dataset/"
     images_directory = "/save/2017018/bdegue01/datasets/GTA_dataset/images"
-    
+    validation_ratio = 0.05
+
     with open(json_path) as json_file:
         data = json.load(json_file)
-    with open(join(output_path, 'boxes_{}.csv'.format(name)), mode='w') as csv_file:
+        random.shuffle(data)
+        training_limit = int((1 - validation_ratio) * len(data))
+    with open(join(output_path, 'boxes_{}_train.csv'.format(name)), mode='w') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        for image in data:
+        for image in data[:training_limit]:
+            filename, file_extension = splitext(image["name"])
+            image_path = join(images_directory, filename + "_synthesized_image.jpg")
+            for labels in image["labels"]:
+                labels["category"] = translation[labels["category"]]
+                if labels["category"] == "DontCare":
+                    continue
+                csv_writer.writerow([image_path, labels["box2d"]["y1"], labels["box2d"]["x1"], labels["box2d"]["y2"], labels["box2d"]["x2"], labels["category"]])
+    with open(join(output_path, 'boxes_{}_val.csv'.format(name)), mode='w') as csv_file:
+        csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        for image in data[training_limit:]:
             filename, file_extension = splitext(image["name"])
             image_path = join(images_directory, filename + "_synthesized_image.jpg")
             for labels in image["labels"]:
@@ -94,7 +109,7 @@ if args.json:
                 csv_writer.writerow([image_path, labels["box2d"]["y1"], labels["box2d"]["x1"], labels["box2d"]["y2"], labels["box2d"]["x2"], labels["category"]])
     
 else:
-    set_path = "/save/2017018/bdegue01/datasets/MIISST_camera_snapshots/sets/val.txt"
+    set_path = "/save/2017018/bdegue01/datasets/MIISST_camera_snapshots/sets/test.txt"
     xmls_path = "/save/2017018/bdegue01/datasets/MIISST_camera_snapshots/xmls/"
     output_path = "/save/2017018/bdegue01/datasets/MIISST_camera_snapshots/"
     images_directory = "/save/2017018/bdegue01/datasets/MIISST_camera_snapshots/images"
@@ -102,7 +117,7 @@ else:
     with open(set_path) as set_file:
         lines = set_file.read().splitlines()
 
-    with open(join(output_path, 'boxes_train.csv'), mode='w') as csv_file:
+    with open(join(output_path, 'boxes_test.csv'), mode='w') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for image_name in lines:
             filename = '{}'.format(image_name) + '.jpg'
