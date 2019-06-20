@@ -40,6 +40,7 @@ from ..callbacks.eval import Evaluate
 from ..models.retinanet import retinanet_bbox
 from ..preprocessing.csv_generator import CSVGenerator
 from ..preprocessing.kitti import KittiGenerator
+from ..preprocessing.kitti_csv import KittiCSVGenerator
 from ..preprocessing.open_images import OpenImagesGenerator
 from ..preprocessing.pascal_voc import PascalVocGenerator
 from ..utils.anchors import make_shapes_callback
@@ -378,6 +379,11 @@ def parse_args(args):
 
     kitti_parser = subparsers.add_parser('kitti')
     kitti_parser.add_argument('kitti_path', help='Path to dataset directory (ie. /tmp/kitti).')
+
+    kitti_csv_parser = subparsers.add_parser('kitti_csv')
+    kitti_csv_parser.add_argument('kitti_path', help='Path to dataset directory (ie. /tmp/kitti).')
+    kitti_csv_parser.add_argument('annotations', help='Path to CSV file containing annotations for training.')
+    kitti_csv_parser.add_argument('--val-annotations', help='Path to CSV file containing annotations for validation (optional).')
 
     def csv_list(string):
         return string.split(',')
