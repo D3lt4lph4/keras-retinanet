@@ -43,11 +43,11 @@ if args.kitti:
         'person': 'Pedestrian',
         'car': 'Car',
         'bus': 'Truck',
-        'caravan': 'DontCare',
+        'caravan': 'Car',
         'motorcycle': 'DontCare',
         'rider': 'DontCare',
         'bicycle': 'Cyclist',
-        'trailer': 'DontCare'
+        'trailer': 'Truck'
     }
 else:
     name = "miisst"
@@ -62,11 +62,11 @@ else:
             'person': 'DontCare',
             'car': 'Car',
             'bus': 'Truck',
-            'caravan': 'DontCare',
-            'motorcycle': 'DontCare',
+            'caravan': 'Car',
+            'motorcycle': 'Motorcycle',
             'bicycle': 'DontCare',
             'rider': 'DontCare',
-            'trailer': 'DontCare'
+            'trailer': 'Truck'
         }
     else:
         translation = {
@@ -79,35 +79,50 @@ else:
 
 if args.json:
     json_path = "/save/2017018/bdegue01/datasets/GTA_dataset/bounding_box.json"
-    output_path = "/save/2017018/bdegue01/datasets/GTA_dataset/"
-    images_directory = "/save/2017018/bdegue01/datasets/GTA_dataset/images"
-    validation_ratio = 0.05
+    output_path = "/save/2017018/bdegue01/datasets/GTA_dataset/datasets"
+    images_directory = "/save/2017018/bdegue01/datasets/GTA_dataset/generated_images"
+    train_set = "/save/2017018/bdegue01/datasets/GTA_dataset/datasets/boxes_train.txt"
+    val_set = "/save/2017018/bdegue01/datasets/GTA_dataset/datasets/boxes_val.txt"
 
     with open(json_path) as json_file:
         data = json.load(json_file)
-        random.shuffle(data)
-        training_limit = int((1 - validation_ratio) * len(data))
-    with open(join(output_path, 'boxes_{}_train.csv'.format(name)), mode='w') as csv_file:
-        csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        for image in data[:training_limit]:
-            filename, file_extension = splitext(image["name"])
-            image_path = join(images_directory, filename + "_synthesized_image.jpg")
-            for labels in image["labels"]:
-                labels["category"] = translation[labels["category"]]
-                if labels["category"] == "DontCare":
-                    continue
-                csv_writer.writerow([image_path, labels["box2d"]["y1"], labels["box2d"]["x1"], labels["box2d"]["y2"], labels["box2d"]["x2"], labels["category"]])
-    with open(join(output_path, 'boxes_{}_val.csv'.format(name)), mode='w') as csv_file:
-        csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        for image in data[training_limit:]:
-            filename, file_extension = splitext(image["name"])
-            image_path = join(images_directory, filename + "_synthesized_image.jpg")
-            for labels in image["labels"]:
-                labels["category"] = translation[labels["category"]]
-                if labels["category"] == "DontCare":
-                    continue
-                csv_writer.writerow([image_path, labels["box2d"]["y1"], labels["box2d"]["x1"], labels["box2d"]["y2"], labels["box2d"]["x2"], labels["category"]])
-    
+
+    with open(train_set) as train:
+        temp = train.readlines()
+        train_files = {file.rstrip("\n") for file in temp}
+
+    with open(val_set) as val:
+        temp = val.readlines()
+        val_files = {file.rstrip("\n") for file in temp}
+
+    csv_file_train = open(join(output_path, 'boxes_{}_train.csv'.format(name)), mode='w')
+    csv_writer_train = csv.writer(csv_file_train, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    csv_file_val = open(join(output_path, 'boxes_{}_val.csv'.format(name)), mode='w')
+    csv_writer_val = csv.writer(csv_file_val, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+    for image in data:
+        filename, file_extension = splitext(image["name"])
+        image_path = join(images_directory, filename + ".jpg")
+
+        labels_written = 0
+        for labels in image["labels"]:
+            labels["category"] = translation[labels["category"]]
+            if labels["category"] == "DontCare":
+                continue
+            labels_written += 1
+            #print(image["name"])
+            if image["name"] in val_files:
+                csv_writer_val.writerow([image_path, labels["box2d"]["y1"], labels["box2d"]["x1"], labels["box2d"]["y2"], labels["box2d"]["x2"], labels["category"]])
+            else:
+                csv_writer_train.writerow([image_path, labels["box2d"]["y1"], labels["box2d"]["x1"], labels["box2d"]["y2"], labels["box2d"]["x2"], labels["category"]])
+
+        if labels_written == 0:
+            csv_writer_train.writerow([image_path, "", "", "", "", ""])
+
+    csv_file_train.close()
+    csv_file_val.close()
+
+
 else:
     set_path = "/save/2017018/bdegue01/datasets/MIISST_camera_snapshots/sets/test.txt"
     xmls_path = "/save/2017018/bdegue01/datasets/MIISST_camera_snapshots/xmls/"
@@ -127,6 +142,9 @@ else:
 
             tree = ElementTree.parse(xml_path)
             root = tree.getroot()
+
+            if len(root.findall('object')) == 0:
+                csv_writer.writerow([image_path, "", "", "", "", ""])
 
             for object_tree in root.findall('object'):
                 x_min = -1
@@ -151,6 +169,3 @@ with open(join(output_path, 'mapping_{}.csv'.format(name)), mode='w') as csv_fil
     sorted_x = sorted(classes.items(), key=operator.itemgetter(1))
     for key in sorted_x:
         csv_writer.writerow([key[0], key[1]])
-
-
-        
