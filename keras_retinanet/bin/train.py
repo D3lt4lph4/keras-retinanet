@@ -338,10 +338,9 @@ def create_generators(args, preprocess_image):
             **common_args
         )
 
-        validation_generator = KittiCSVGenerator(
+        validation_generator = KittiGenerator(
             args.kitti_path,
             subset='val',
-            csv_data_file=args.val_annotations,
             **common_args
         )
     else:
