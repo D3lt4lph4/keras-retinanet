@@ -14,14 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+from .generator import Generator
+from ..utils.image import read_image_bgr
+
 import csv
 import os.path
+import sys
+
+import random
 
 import numpy as np
 from PIL import Image
+from six import raise_from
 
-from .generator import Generator
-from ..utils.image import read_image_bgr
 
 kitti_classes = {
     'Car': 0,
@@ -35,6 +40,16 @@ kitti_classes = {
     'DontCare': 7
 }
 
+def _open_for_csv(path):
+    """ Open a file with flags suitable for csv.reader.
+
+    This is different for python2 it means with mode 'rb',
+    for python3 this means 'r' with "universal newlines".
+    """
+    if sys.version_info[0] < 3:
+        return open(path, 'rb')
+    else:
+        return open(path, 'r', newline='')
 
 class KittiCSVGenerator(Generator):
     """ Generate data for a KITTI dataset.
@@ -45,8 +60,8 @@ class KittiCSVGenerator(Generator):
     def __init__(
         self,
         base_dir,
-        subset='train',
         csv_data_file,
+        subset='train',
         base_dir_csv=None,
         **kwargs
     ):
@@ -132,7 +147,6 @@ class KittiCSVGenerator(Generator):
                 boxes.append(annotation)
             self.image_data[kitti_len + i] = boxes
             self.images.append(os.path.join(base_dir_csv, key))
-    
         super(KittiCSVGenerator, self).__init__(**kwargs)
 
     def size(self):

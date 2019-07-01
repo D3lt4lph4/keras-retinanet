@@ -282,6 +282,7 @@ def create_generators(args, preprocess_image):
             args.annotations,
             args.classes,
             transform_generator=transform_generator,
+            group_method="random",
             **common_args
         )
 
@@ -325,6 +326,22 @@ def create_generators(args, preprocess_image):
         validation_generator = KittiGenerator(
             args.kitti_path,
             subset='val',
+            **common_args
+        )
+    elif args.dataset_type == 'kitti_csv':
+        train_generator = KittiCSVGenerator(
+            args.kitti_path,
+            subset='train',
+            csv_data_file=args.annotations,
+            transform_generator=transform_generator,
+            group_method="random",
+            **common_args
+        )
+
+        validation_generator = KittiCSVGenerator(
+            args.kitti_path,
+            subset='val',
+            csv_data_file=args.val_annotations,
             **common_args
         )
     else:

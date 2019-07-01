@@ -31,6 +31,7 @@ if __name__ == "__main__" and __package__ is None:
 from ..preprocessing.pascal_voc import PascalVocGenerator
 from ..preprocessing.csv_generator import CSVGenerator
 from ..preprocessing.kitti import KittiGenerator
+from ..preprocessing.kitti_csv import KittiCSVGenerator
 from ..preprocessing.open_images import OpenImagesGenerator
 from ..utils.keras_version import check_keras_version
 from ..utils.transform import random_transform_generator
@@ -111,6 +112,18 @@ def create_generator(args):
             image_max_side=args.image_max_side,
             config=args.config
         )
+    elif args.dataset_type == 'kitti_csv':
+        generator = KittiCSVGenerator(
+            args.kitti_path,
+            subset=args.subset,
+            csv_data_file=args.annotations,
+            transform_generator=transform_generator,
+            image_min_side=args.image_min_side,
+            image_max_side=args.image_max_side,
+            group_method="random",
+            config=args.config
+        )
+        generator.on_epoch_end()
     else:
         raise ValueError('Invalid data type received: {}'.format(args.dataset_type))
 
@@ -135,6 +148,11 @@ def parse_args(args):
     kitti_parser = subparsers.add_parser('kitti')
     kitti_parser.add_argument('kitti_path', help='Path to dataset directory (ie. /tmp/kitti).')
     kitti_parser.add_argument('subset', help='Argument for loading a subset from train/val.')
+
+    kitti_csv_parser = subparsers.add_parser('kitti_csv')
+    kitti_csv_parser.add_argument('kitti_path', help='Path to dataset directory (ie. /tmp/kitti).')
+    kitti_csv_parser.add_argument('subset', help='Argument for loading a subset from train/val.')
+    kitti_csv_parser.add_argument('annotations', help='Path to CSV file containing annotations for training.')
 
     def csv_list(string):
         return string.split(',')
@@ -171,7 +189,7 @@ def run(generator, args, anchor_params):
         args: parseargs args object.
     """
     # display images, one at a time
-    for i in range(generator.size()):
+    for i in range(generator.size()-1, 0, -1):
         # load the data
         image       = generator.load_image(i)
         annotations = generator.load_annotations(i)
