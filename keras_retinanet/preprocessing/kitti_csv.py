@@ -146,7 +146,7 @@ class KittiCSVGenerator(Generator):
                 annotation = {'cls_id': kitti_classes[annot["class"]], 'x1': annot['x1'], 'x2': annot['x2'], 'y2': annot['y2'], 'y1': annot['y1']}
                 boxes.append(annotation)
             self.image_data[kitti_len + i] = boxes
-            self.images.append(os.path.join(base_dir_csv, key))
+            self.images.append(key)
         super(KittiCSVGenerator, self).__init__(**kwargs)
 
     def size(self):
