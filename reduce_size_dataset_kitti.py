@@ -37,7 +37,7 @@ for train_file in train_files_images:
     root, _ = splitext(filename)
 
     copy(train_file, join(args.output_dir, "train", "images", filename), follow_symlinks=False)
-    copy(train_file, join(args.output_dir, "train", "labels", root + ".txt"), follow_symlinks=False)
+    copy(join(args.input_dir, "train", "labels", root + ".txt"), join(args.output_dir, "train", "labels", root + ".txt"), follow_symlinks=False)
 
 # Copy the validation files to the new directory
 for val_file in val_files_images:
@@ -45,7 +45,7 @@ for val_file in val_files_images:
     root, _ = splitext(filename)
 
     copy(val_file, join(args.output_dir, "val", "images", filename), follow_symlinks=False)
-    copy(val_file, join(args.output_dir, "val", "labels", root + ".txt"), follow_symlinks=False)
+    copy(join(args.input_dir, "val", "labels", root + ".txt"), join(args.output_dir, "val", "labels", root + ".txt"), follow_symlinks=False)
 
 # Copy the testing files to the new directory
 for test_file in test_files_images:
@@ -53,4 +53,4 @@ for test_file in test_files_images:
     root, _ = splitext(filename)
 
     copy(test_file, join(args.output_dir, "test", "images", filename), follow_symlinks=False)
-    copy(test_file, join(args.output_dir, "test", "labels", root + ".txt"), follow_symlinks=False)
+    copy(join(args.input_dir, "train", "labels", root + ".txt"), join(args.output_dir, "test", "labels", root + ".txt"), follow_symlinks=False)
