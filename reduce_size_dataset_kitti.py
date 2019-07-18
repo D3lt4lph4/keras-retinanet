@@ -4,7 +4,7 @@ import random
 
 from shutil import copy
 from os import listdir, makedirs
-from os.path import join, basename, splitext
+from os.path import join, basename, splitext, isdir
 
 parser = argparse.ArgumentParser()
 parser.add_argument("input_dir", help="The file containing the description of the dataset.") 
@@ -23,6 +23,17 @@ makedirs(join(args.output_dir, "test", "labels"))
 # Reading all the training files
 train_files_images = [join(args.input_dir, "train", "images", f) for f in listdir(join(args.input_dir, "train", "images"))]
 val_files_images = [join(args.input_dir, "val", "images", f ) for f in listdir(join(args.input_dir, "val", "images"))]
+
+# if a test dir exists in the input directory, copy all the files to the output test dir
+if isdir(join(args.input_dir, "test", "images")):
+    test_existing_image = [join(args.input_dir, "test", "images", f) for f in listdir(join(args.input_dir, "test", "images"))]
+    for image_path in test_existing_image:
+        filename = basename(image_path)
+        root, _ = splitext(filename)
+
+        copy(image_path, join(args.output_dir, "test", "images", filename), follow_symlinks=False)
+        copy(join(args.input_dir, "train", "labels", root + ".txt"), join(args.output_dir, "test", "labels", root + ".txt"), follow_symlinks=False)
+
 
 random.shuffle(train_files_images)
 
