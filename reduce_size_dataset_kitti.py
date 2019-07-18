@@ -32,7 +32,7 @@ if isdir(join(args.input_dir, "test", "images")):
         root, _ = splitext(filename)
 
         copy(image_path, join(args.output_dir, "test", "images", filename), follow_symlinks=False)
-        copy(join(args.input_dir, "train", "labels", root + ".txt"), join(args.output_dir, "test", "labels", root + ".txt"), follow_symlinks=False)
+        copy(join(args.input_dir, "test", "labels", root + ".txt"), join(args.output_dir, "test", "labels", root + ".txt"), follow_symlinks=False)
 
 
 random.shuffle(train_files_images)
