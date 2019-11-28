@@ -5,3 +5,6 @@ __pycache__/
 /.pytest_cache
 /.cache
 *.json
+*.txt
+*.zip
+*.o
