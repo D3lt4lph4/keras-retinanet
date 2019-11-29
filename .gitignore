@@ -8,3 +8,5 @@ __pycache__/
 *.txt
 *.zip
 *.o
+.virtualenv/**
+.eggs/**
