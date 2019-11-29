@@ -63,7 +63,7 @@ class BDD100KSetGenerator(Generator):
         self.set_file = set_file
 
         labels_file = os.path.join(self.base_dir, "labels", "bdd100k_labels_images_{}.json".format(subset))
-        image_dir = os.path.join(self.base_dir, "images", "10k", subset)
+        image_dir = os.path.join(self.base_dir, "images", "100k", subset)
 
         """
         1    type         Describes the type of object: 'Car', 'Van', 'Truck',
@@ -100,7 +100,7 @@ class BDD100KSetGenerator(Generator):
         self.images = []
 
         with open(self.set_file, "r") as file:
-            images = file.readlines()
+            images = [line.strip() for line in file.readlines()]
         
         for i, fn in enumerate(images):
             image_fp = os.path.join(image_dir, fn)
@@ -121,8 +121,9 @@ class BDD100KSetGenerator(Generator):
                     boxes.append(annotation)
 
             self.image_data[i] = boxes
-
-        super(BDD100KGenerator, self).__init__(**kwargs)
+        
+        print("Found {} images in the {} set.".format(len(self.images), subset))
+        super(BDD100KSetGenerator, self).__init__(**kwargs)
 
     def size(self):
         """ Size of the dataset.

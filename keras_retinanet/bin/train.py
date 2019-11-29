@@ -373,7 +373,6 @@ def create_generators(args, preprocess_image):
         validation_generator = BDD100KGenerator(
             args.bdd100k_path,
             subset='val',
-            set_file=args.set_file_validation,
             **common_args
         )
     elif args.dataset_type == 'bdd100k_set':
@@ -389,7 +388,6 @@ def create_generators(args, preprocess_image):
         validation_generator = BDD100KGenerator(
             args.bdd100k_path,
             subset='val',
-            set_file=args.set_file_validation,
             **common_args
         )
     else:
