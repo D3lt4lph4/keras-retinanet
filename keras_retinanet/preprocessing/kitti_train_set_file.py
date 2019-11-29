@@ -87,7 +87,7 @@ class KittiSetGenerator(Generator):
         self.images = []
 
         with open(self.set_file, "r") as file:
-            images = file.readlines()
+            images = [line.strip() for line in file.readlines()]
         
         for i, fn in enumerate(images):
             image_fp = os.path.join(image_dir, fn)
@@ -109,8 +109,8 @@ class KittiSetGenerator(Generator):
                     boxes.append(annotation)
 
                 self.image_data[i] = boxes
-
-        super(KittiGenerator, self).__init__(**kwargs)
+        print("Found {} images in the {} set.".format(len(self.images), subset))
+        super(KittiSetGenerator, self).__init__(**kwargs)
 
     def size(self):
         """ Size of the dataset.

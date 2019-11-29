@@ -103,6 +103,7 @@ class KittiGenerator(Generator):
 
                 self.image_data[i] = boxes
 
+        print("Found {} images in the {} set.".format(len(self.images), subset))
         super(KittiGenerator, self).__init__(**kwargs)
 
     def size(self):
