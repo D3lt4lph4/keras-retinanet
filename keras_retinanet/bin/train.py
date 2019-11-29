@@ -41,6 +41,9 @@ from ..models.retinanet import retinanet_bbox
 from ..preprocessing.csv_generator import CSVGenerator
 from ..preprocessing.kitti import KittiGenerator
 from ..preprocessing.kitti_csv import KittiCSVGenerator
+from ..preprocessing.kitti_train_set_file import KittiSetGenerator
+from ..preprocessing.bdd100k import BDD100KGenerator
+from ..preprocessing.bdd100k_set_file import BDD100KSetGenerator
 from ..preprocessing.open_images import OpenImagesGenerator
 from ..preprocessing.pascal_voc import PascalVocGenerator
 from ..utils.anchors import make_shapes_callback
@@ -343,6 +346,52 @@ def create_generators(args, preprocess_image):
             subset='val',
             **common_args
         )
+    elif args.dataset_type == 'kitti_set':
+        train_generator = KittiSetGenerator(
+            args.kitti_path,
+            subset='train',
+            set_file=args.set_file_training,
+            transform_generator=transform_generator,
+            group_method="random",
+            **common_args
+        )
+
+        validation_generator = KittiGenerator(
+            args.kitti_path,
+            subset='val',
+            **common_args
+        )
+    elif args.dataset_type == 'bdd100k':
+        train_generator = BDD100KGenerator(
+            args.bdd100k_path,
+            subset='train',
+            transform_generator=transform_generator,
+            group_method="random",
+            **common_args
+        )
+
+        validation_generator = BDD100KGenerator(
+            args.bdd100k_path,
+            subset='val',
+            set_file=args.set_file_validation,
+            **common_args
+        )
+    elif args.dataset_type == 'bdd100k_set':
+        train_generator = BDD100KSetGenerator(
+            args.bdd100k_path,
+            subset='train',
+            set_file=args.set_file_training,
+            transform_generator=transform_generator,
+            group_method="random",
+            **common_args
+        )
+
+        validation_generator = BDD100KGenerator(
+            args.bdd100k_path,
+            subset='val',
+            set_file=args.set_file_validation,
+            **common_args
+        )
     else:
         raise ValueError('Invalid data type received: {}'.format(args.dataset_type))
 
@@ -400,6 +449,17 @@ def parse_args(args):
     kitti_csv_parser.add_argument('kitti_path', help='Path to dataset directory (ie. /tmp/kitti).')
     kitti_csv_parser.add_argument('annotations', help='Path to CSV file containing annotations for training.')
     kitti_csv_parser.add_argument('--val-annotations', help='Path to CSV file containing annotations for validation (optional).')
+
+    kitti_set_parser = subparsers.add_parser('kitti_set')
+    kitti_set_parser.add_argument('kitti_path', help='Path to dataset directory (ie. /tmp/kitti).')
+    kitti_set_parser.add_argument('set_file_training', help='Path to the training set file.')
+    
+    bdd100k_parser = subparsers.add_parser('bdd100k')
+    bdd100k_parser.add_argument('bdd100k_path', help="Path to the BDD100K dataset.")
+
+    bdd100k_set_parser = subparsers.add_parser('bdd100k_set')
+    bdd100k_set_parser.add_argument('bdd100k_path', help="Path to the BDD100K dataset.")
+    bdd100k_set_parser.add_argument('set_file_training', help="Path to the training set file.")
 
     def csv_list(string):
         return string.split(',')

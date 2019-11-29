@@ -40,7 +40,7 @@ bdd100k_classes = {
 to_select = ["person", "bike", "truck", "..."]
 
 
-class BDD100KGenerator(Generator):
+class BDD100KSetGenerator(Generator):
     """ Generate data for a BDD100K dataset.
 
     See https://bdd-data.berkeley.edu/ for more information.

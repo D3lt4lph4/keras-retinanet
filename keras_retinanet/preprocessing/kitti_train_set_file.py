@@ -36,7 +36,7 @@ kitti_classes = {
 }
 
 
-class KittiGenerator(Generator):
+class KittiSetGenerator(Generator):
     """ Generate data for a KITTI dataset.
 
     See http://www.cvlibs.net/datasets/kitti/ for more information.
