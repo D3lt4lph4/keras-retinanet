@@ -32,6 +32,9 @@ from ..preprocessing.pascal_voc import PascalVocGenerator
 from ..preprocessing.csv_generator import CSVGenerator
 from ..preprocessing.kitti import KittiGenerator
 from ..preprocessing.kitti_csv import KittiCSVGenerator
+from ..preprocessing.kitti_train_set_file import KittiSetGenerator
+from ..preprocessing.bdd100k import BDD100KGenerator
+from ..preprocessing.bdd100k_set_file import BDD100KSetGenerator
 from ..preprocessing.open_images import OpenImagesGenerator
 from ..utils.keras_version import check_keras_version
 from ..utils.transform import random_transform_generator
@@ -124,6 +127,37 @@ def create_generator(args):
             config=args.config
         )
         generator.on_epoch_end()
+    elif args.dataset_type == 'kitti_set':
+        generator = KittiSetGenerator(
+            args.kitti_path,
+            set_file=args.set_file_training,
+            transform_generator=transform_generator,
+            image_min_side=args.image_min_side,
+            image_max_side=args.image_max_side,
+            group_method="random",
+            config=args.config
+        )
+    elif args.dataset_type == 'bdd100k':
+        generator = BDD100KGenerator(
+            args.bdd100k_path,
+            subset=args.subset,
+            transform_generator=transform_generator,
+            image_min_side=args.image_min_side,
+            image_max_side=args.image_max_side,
+            group_method="random",
+            config=args.config
+        )
+    elif args.dataset_type == 'bdd100k_set':
+        generator = BDD100KSetGenerator(
+            args.bdd100k_path,
+            set_file=args.set_file_training,
+            transform_generator=transform_generator,
+            image_min_side=args.image_min_side,
+            image_max_side=args.image_max_side,
+            group_method="random",
+            config=args.config
+        )
+        generator.on_epoch_end()
     else:
         raise ValueError('Invalid data type received: {}'.format(args.dataset_type))
 
@@ -153,6 +187,18 @@ def parse_args(args):
     kitti_csv_parser.add_argument('kitti_path', help='Path to dataset directory (ie. /tmp/kitti).')
     kitti_csv_parser.add_argument('subset', help='Argument for loading a subset from train/val.')
     kitti_csv_parser.add_argument('annotations', help='Path to CSV file containing annotations for training.')
+
+    kitti_set_parser = subparsers.add_parser('kitti_set')
+    kitti_set_parser.add_argument('kitti_path', help='Path to dataset directory (ie. /tmp/kitti).')
+    kitti_set_parser.add_argument('set_file_training', help='Path to the training set file.')
+    
+    bdd100k_parser = subparsers.add_parser('bdd100k')
+    bdd100k_parser.add_argument('bdd100k_path', help="Path to the BDD100K dataset.")
+    bdd100k_parser.add_argument('subset', help='Argument for loading a subset from train/val.')
+
+    bdd100k_set_parser = subparsers.add_parser('bdd100k_set') 
+    bdd100k_set_parser.add_argument('bdd100k_path', help="Path to the BDD100K dataset.")
+    bdd100k_set_parser.add_argument('set_file_training', help="Path to the training set file.")
 
     def csv_list(string):
         return string.split(',')
@@ -193,10 +239,12 @@ def run(generator, args, anchor_params):
         # load the data
         image       = generator.load_image(i)
         annotations = generator.load_annotations(i)
+
         if len(annotations['labels']) > 0 :
             # apply random transformations
             if args.random_transform:
                 image, annotations = generator.random_transform_group_entry(image, annotations)
+                
 
             # resize the image and annotations
             if args.resize:
