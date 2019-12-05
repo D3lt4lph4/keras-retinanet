@@ -37,8 +37,6 @@ bdd100k_classes = {
     'rider': 9
 }
 
-to_select = ["person", "bike", "truck", "..."]
-
 
 class BDD100KGenerator(Generator):
     """ Generate data for a BDD100K dataset.
@@ -97,7 +95,8 @@ class BDD100KGenerator(Generator):
 
         self.image_data = dict()
         self.images = []
-        
+        index = 0
+
         for i, fn in enumerate(os.listdir(image_dir)):
             if fn not in images_labels:
                 continue
@@ -106,19 +105,21 @@ class BDD100KGenerator(Generator):
             self.images.append(image_fp)
 
             # Extract label information from the data
+            print(fn)
             image_data = images_labels[fn]
 
             boxes = []
 
             for object_present in image_data["labels"]:
-                if object_present["category"] in to_select:
+                if object_present["category"] in bdd100k_classes:
                     cls_id = bdd100k_classes[object_present["category"]]
                     box = object_present["box2d"]
                     x1, x2, y1, y2 = box["x1"], box["x2"], box["y1"], box["y2"],
                     annotation = {'cls_id': cls_id, 'x1': x1, 'x2': x2, 'y2': y2, 'y1': y1}
                     boxes.append(annotation)
 
-            self.image_data[i] = boxes
+            self.image_data[index] = boxes
+            index += 1
 
         print("Found {} images in the {} set.".format(len(self.images), subset))
         super(BDD100KGenerator, self).__init__(**kwargs)

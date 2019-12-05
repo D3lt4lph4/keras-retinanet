@@ -37,8 +37,6 @@ bdd100k_classes = {
     'rider': 9
 }
 
-to_select = ["person", "bike", "truck", "..."]
-
 
 class BDD100KSetGenerator(Generator):
     """ Generate data for a BDD100K dataset.
@@ -113,7 +111,7 @@ class BDD100KSetGenerator(Generator):
             boxes = []
 
             for object_present in image_data["labels"]:
-                if object_present["category"] in to_select:
+                if object_present["category"] in bdd100k_classes:
                     cls_id = bdd100k_classes[object_present["category"]]
                     box = object_present["box2d"]
                     x1, x2, y1, y2 = box["x1"], box["x2"], box["y1"], box["y2"],
