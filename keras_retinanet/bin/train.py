@@ -385,7 +385,7 @@ def create_generators(args, preprocess_image):
             **common_args
         )
 
-        validation_generator = BDD100KGenerator(
+        validation_generator = BDD100KSetGenerator(
             args.bdd100k_path,
             subset='val',
             set_file=args.set_file_validation,
