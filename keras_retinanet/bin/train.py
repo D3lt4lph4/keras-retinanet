@@ -388,6 +388,7 @@ def create_generators(args, preprocess_image):
         validation_generator = BDD100KGenerator(
             args.bdd100k_path,
             subset='val',
+            set_file=args.set_file_validation,
             **common_args
         )
     else:
@@ -458,6 +459,7 @@ def parse_args(args):
     bdd100k_set_parser = subparsers.add_parser('bdd100k_set')
     bdd100k_set_parser.add_argument('bdd100k_path', help="Path to the BDD100K dataset.")
     bdd100k_set_parser.add_argument('set_file_training', help="Path to the training set file.")
+    bdd100k_set_parser.add_argument('set_file_validation', help="Path to the validation set file.")
 
     def csv_list(string):
         return string.split(',')
