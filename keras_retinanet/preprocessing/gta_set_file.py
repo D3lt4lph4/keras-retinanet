@@ -46,7 +46,9 @@ kitti_classes = {
     'Cyclist': 5,
     'Tram': 6,
     'Misc': 7,
-    'DontCare': 7
+    'DontCare': 7,
+    'caravan': 8,
+    'trailer': 9
 }
 
 bdd_matching = {
@@ -61,7 +63,7 @@ bdd_matching = {
 
 kitti_matching = {
     "truck": "Truck",
-    "person": "Person",
+    "person": "Pedestrian",
     "car": "Car",
     "bus": "DontCare",
     "caravan": "caravan",
@@ -82,7 +84,6 @@ class GTAVSetGenerator(Generator):
         self,
         base_dir,
         set_file,
-        bb_file,
         matching,
         subset,
         **kwargs
@@ -95,14 +96,13 @@ class GTAVSetGenerator(Generator):
         """
         self.base_dir = base_dir
         self.set_file = set_file
-        self.bb_file = bb_file
-        self.matching = matching
 
-
-        if subset = "real":
+        if subset == "real":
             image_dir = os.path.join(self.base_dir, "original_images")
         else:
             image_dir = os.path.join(self.base_dir, "generated_images")
+
+        bb_file = os.path.join(self.base_dir, "bounding_box.json")
 
         """
         1    type         Describes the type of object: 'Car', 'Van', 'Truck',
@@ -124,59 +124,69 @@ class GTAVSetGenerator(Generator):
         self.labels = {}
         if matching == "kitti":
             self.classes = kitti_classes
+            self.matching = kitti_matching
         else:
             self.classes = bdd100k_classes
-        
+            self.matching = bdd_matching
+
         for name, label in self.classes.items():
             self.labels[label] = name
-        
+
         # Load all the labels in a dictionnary
         images_labels = {}
-        with open(bb_file, "r") json_file:
+        with open(bb_file, "r") as json_file:
             label_array = json.load(json_file)
-        
+
         for label in label_array:
             images_labels[label["name"]] = label
 
         with open(set_file) as file:
             target_images = [line.strip() for line in file.readlines()]
-        
 
         self.image_data = dict()
         self.images = []
 
         with open(self.set_file, "r") as file:
             images = [line.strip() for line in file.readlines()]
-        
+
         if subset == "real":
             suffix = ""
         else:
             suffix = "_synthesized_image"
 
         for i, fn in enumerate(images):
+            label = fn + ".png"
             image_fp = os.path.join(image_dir, fn + suffix + ".jpg")
 
             self.images.append(image_fp)
 
             # Extract label information from the data
-            image_data = images_labels[fn]
+            image_data = images_labels[label]
 
             boxes = []
 
             for object_present in image_data["labels"]:
+
                 if object_present["category"] in self.matching:
-                    cls_id = bdd100k_classes[self.matching[object_present["category"]]]
+                    cls_id = self.classes[self.matching[object_present["category"]]]
                     box = object_present["box2d"]
-                    x1, x2, y1, y2 = box["x1"], box["x2"], box["y1"], box["y2"],
-                    annotation = {'cls_id': cls_id, 'x1': x1, 'x2': x2, 'y2': y2, 'y1': y1}
+                    if subset == "real":
+                        y_coeff = 1920. / 2048.
+                        x_coeff = 1080 / 1024.
+                        y1, y2, x1, x2 = box["x1"] * x_coeff, box["x2"] * x_coeff, box["y1"] * y_coeff, box["y2"] * y_coeff
+                    else:
+                        y1, y2, x1, x2 = box["x1"], box["x2"], box["y1"], box["y2"]
+                    annotation = {'cls_id': cls_id, 'x1': x1,
+                                  'x2': x2, 'y2': y2, 'y1': y1}
                     boxes.append(annotation)
                 else:
                     continue
-
             self.image_data[i] = boxes
         
+        print(len(self.image_data))
+
         print("Found {} images in the {} set.".format(len(self.images), subset))
-        super(BDD100KSetGenerator, self).__init__(**kwargs)
+        super(GTAVSetGenerator, self).__init__(**kwargs)
 
     def size(self):
         """ Size of the dataset.
@@ -218,13 +228,15 @@ class GTAVSetGenerator(Generator):
     def load_image(self, image_index):
         """ Load an image at the image_index.
         """
+        print(self.images[image_index])
         return read_image_bgr(self.images[image_index])
 
     def load_annotations(self, image_index):
         """ Load annotations for an image_index.
         """
         image_data = self.image_data[image_index]
-        annotations = {'labels': np.empty((len(image_data),)), 'bboxes': np.empty((len(image_data), 4))}
+        annotations = {'labels': np.empty(
+            (len(image_data),)), 'bboxes': np.empty((len(image_data), 4))}
 
         for idx, ann in enumerate(image_data):
             annotations['bboxes'][idx, 0] = float(ann['x1'])
