@@ -78,7 +78,7 @@ def create_generator(args):
     elif args.dataset_type == 'kitti':
         validation_generator = KittiGenerator(
             args.kitti_path,
-            subset='val',
+            subset='test',
             image_min_side=args.image_min_side,
             image_max_side=args.image_max_side,
             config=args.config

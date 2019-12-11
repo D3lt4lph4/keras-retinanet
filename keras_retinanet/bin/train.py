@@ -44,6 +44,7 @@ from ..preprocessing.kitti_csv import KittiCSVGenerator
 from ..preprocessing.kitti_train_set_file import KittiSetGenerator
 from ..preprocessing.bdd100k import BDD100KGenerator
 from ..preprocessing.bdd100k_set_file import BDD100KSetGenerator
+from ..preprocessing.gta_set_file import GTAVSetGenerator
 from ..preprocessing.open_images import OpenImagesGenerator
 from ..preprocessing.pascal_voc import PascalVocGenerator
 from ..utils.anchors import make_shapes_callback
@@ -391,6 +392,26 @@ def create_generators(args, preprocess_image):
             set_file=args.set_file_validation,
             **common_args
         )
+    elif args.dataset_type == 'gtav_set':
+        train_generator = GTAVSetGenerator(
+            args.base_dir,
+            set_file=args.set_file_training,
+            matching=args.matching,
+            subset=args.subset,
+            transform_generator=transform_generator,
+            group_method="random",
+            **common_args
+        )
+
+        validation_generator = BDD100KSetGenerator(
+            args.base_dir,
+            set_file=args.set_file_validation,
+            matching=args.matching,
+            subset=args.subset,
+            **common_args
+        )
+
+
     else:
         raise ValueError('Invalid data type received: {}'.format(args.dataset_type))
 
