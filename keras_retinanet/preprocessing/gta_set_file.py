@@ -55,6 +55,7 @@ bdd_matching = {
     "truck": "truck",
     "person": "person",
     "car": "car",
+    "caravan": "car",
     "bus": "bus",
     "motorcycle": "motor",
     "rider": "rider",
@@ -66,11 +67,11 @@ kitti_matching = {
     "person": "Pedestrian",
     "car": "Car",
     "bus": "DontCare",
-    "caravan": "caravan",
+    "caravan": "Car",
     "motorcycle": "DontCare",
     "rider": "DontCare",
     "bicycle": "Cyclist",
-    "trailer": "trailer"
+    "trailer": "DontCare"
 }
 
 
