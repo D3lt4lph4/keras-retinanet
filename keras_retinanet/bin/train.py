@@ -404,7 +404,7 @@ def create_generators(args, preprocess_image):
             **common_args
         )
 
-        validation_generator = BDD100KSetGenerator(
+        validation_generator = GTAVSetGenerator(
             args.base_dir,
             set_file=args.set_file_validation,
             matching=args.matching,
@@ -501,19 +501,21 @@ def parse_args(args):
     bdd100k_set_parser.add_argument('set_file_training', help="Path to the training set file.")
     bdd100k_set_parser.add_argument('set_file_validation', help="Path to the validation set file.")
 
-    gtav_set_parser = subparsers.add_parser('gtav_set') 
+    gtav_set_parser = subparsers.add_parser('gtav_set')
     gtav_set_parser.add_argument('base_dir', help="Path to the GTAV dataset.")
-    gtav_set_parser.add_argument('set_file_training', help="Path to the set file.")
-    gtav_set_parser.add_argument('set_file_validation', help="Path to the set file.")
+    gtav_set_parser.add_argument('set_file_training', help="Path to the training set file.")
+    gtav_set_parser.add_argument('set_file_validation', help="Path to the validation set file.")
     gtav_set_parser.add_argument('matching', help="Which matching to use, kitti or bbd100k")
-    gtav_set_parser.add_argument('subset', help="Name of the subset to use, either real or fake.")
+    gtav_set_parser.add_argument('subset', help="Name of the subset to use, either real of fake.")
 
     synthia_set_parser = subparsers.add_parser('gtav_set') 
     synthia_set_parser.add_argument('base_dir', help="Path to the GTAV dataset.")
-    synthia_set_parser.add_argument('set_file_training', help="Path to the set file.")
-    synthia_set_parser.add_argument('set_file_validation', help="Path to the set file.")
+    synthia_set_parser.add_argument('set_file_training', help="Path to the training set file.")
+    synthia_set_parser.add_argument('set_file_validation', help="Path to the validation set file.")
     synthia_set_parser.add_argument('matching', help="Which matching to use, kitti or bbd100k")
     synthia_set_parser.add_argument('subset', help="Name of the subset to use, either gen, kitti, cityscape.")
+
+    
 
     def csv_list(string):
         return string.split(',')
