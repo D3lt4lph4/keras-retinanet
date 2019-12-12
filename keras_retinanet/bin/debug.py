@@ -36,6 +36,7 @@ from ..preprocessing.kitti_train_set_file import KittiSetGenerator
 from ..preprocessing.bdd100k import BDD100KGenerator
 from ..preprocessing.bdd100k_set_file import BDD100KSetGenerator
 from ..preprocessing.gta_set_file import GTAVSetGenerator
+from ..preprocessing.synthia_set_file import SynthiaSetGenerator
 from ..preprocessing.open_images import OpenImagesGenerator
 from ..utils.keras_version import check_keras_version
 from ..utils.transform import random_transform_generator
@@ -170,6 +171,18 @@ def create_generator(args):
             group_method="random",
             config=args.config
         )
+    elif args.dataset_type == 'synthia_set':
+        generator = SynthiaSetGenerator(
+            args.base_dir,
+            set_file=args.set_file,
+            matching=args.matching,
+            subset=args.subset,
+            transform_generator=transform_generator,
+            image_min_side=args.image_min_side,
+            image_max_side=args.image_max_side,
+            group_method="random",
+            config=args.config
+        )
     else:
         raise ValueError('Invalid data type received: {}'.format(args.dataset_type))
 
@@ -216,7 +229,13 @@ def parse_args(args):
     gtav_set_parser.add_argument('base_dir', help="Path to the GTAV dataset.")
     gtav_set_parser.add_argument('set_file', help="Path to the set file.")
     gtav_set_parser.add_argument('matching', help="Which matching to use, kitti or bbd100k")
-    gtav_set_parser.add_argument('subset', help="Name of the subset to use, either real of fake.")
+    gtav_set_parser.add_argument('subset', help="Name of the subset to use, either real or fake.")
+
+    synthia_set_parser = subparsers.add_parser('gtav_set') 
+    synthia_set_parser.add_argument('base_dir', help="Path to the GTAV dataset.")
+    synthia_set_parser.add_argument('set_file', help="Path to the set file.")
+    synthia_set_parser.add_argument('matching', help="Which matching to use, kitti or bbd100k")
+    synthia_set_parser.add_argument('subset', help="Name of the subset to use, either gen, kitti, cityscape.")
 
 
     def csv_list(string):
