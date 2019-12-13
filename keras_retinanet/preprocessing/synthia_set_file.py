@@ -55,8 +55,7 @@ kitti_classes = {
 bdd_matching = {
     "Pedestrian": "person",
     "Car": "car",
-    "Cyclist": "bike",
-    "Sign": 'traffic sign'
+    "Cyclist": "bike"
 }
 
 kitti_matching = {
@@ -135,11 +134,9 @@ class SynthiaSetGenerator(Generator):
         self.images = []
 
         for i, fn in enumerate(image_labels):
-            image_fp = os.path.join(image_dir, fn)
+            image_fp = os.path.join(image_dir, fn.replace(".png", "_fake.png"))
 
             self.images.append(image_fp)
-
-            fn = fn.replace("_fake", "")
 
             # Extract label information from the data
             image_data = image_labels[fn]
