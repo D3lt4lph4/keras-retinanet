@@ -15,6 +15,7 @@ limitations under the License.
 """
 
 import csv
+from os import listdir
 import os.path
 
 import numpy as np
@@ -96,7 +97,7 @@ class SynthiaSetGenerator(Generator):
             image_dir = os.path.join(self.base_dir, "cityscapes_generated")
 
 
-        bb_file = os.path.join(self.base_dir, "sets", set_file)
+        bb_file = set_file
 
         """
         1    type         Describes the type of object: 'Car', 'Van', 'Truck',
@@ -127,29 +128,30 @@ class SynthiaSetGenerator(Generator):
             self.labels[label] = name
 
         # Load all the labels in a dictionnary
-        images_labels = {}
         with open(bb_file, "r") as json_file:
             image_labels = json.load(json_file)
 
         self.image_data = dict()
         self.images = []
 
-        for i, fn in enumerate(listdir(image_dir)):
+        for i, fn in enumerate(image_labels):
             image_fp = os.path.join(image_dir, fn)
 
             self.images.append(image_fp)
 
+            fn = fn.replace("_fake", "")
+
             # Extract label information from the data
-            image_data = images_labels[fn]
+            image_data = image_labels[fn]
 
             boxes = []
 
-            for object_present in image_data["labels"]:
+            for object_present in image_labels[fn]:
 
                 if object_present["category"] in self.matching:
                     cls_id = self.classes[self.matching[object_present["category"]]]
                     box = object_present["box2d"]
-                    x1, y1, x2, Y2 = box["x1"], box["x2"], box["y1"], box["y2"]
+                    x1, x2, y1, y2 = box["x1"], box["x2"], box["y1"], box["y2"]
                     annotation = {'cls_id': cls_id, 'x1': x1,
                                   'x2': x2, 'y2': y2, 'y1': y1}
                     boxes.append(annotation)

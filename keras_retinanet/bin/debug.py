@@ -231,7 +231,7 @@ def parse_args(args):
     gtav_set_parser.add_argument('matching', help="Which matching to use, kitti or bbd100k")
     gtav_set_parser.add_argument('subset', help="Name of the subset to use, either real or fake.")
 
-    synthia_set_parser = subparsers.add_parser('gtav_set') 
+    synthia_set_parser = subparsers.add_parser('synthia_set') 
     synthia_set_parser.add_argument('base_dir', help="Path to the GTAV dataset.")
     synthia_set_parser.add_argument('set_file', help="Path to the set file.")
     synthia_set_parser.add_argument('matching', help="Which matching to use, kitti or bbd100k")
@@ -278,8 +278,8 @@ def run(generator, args, anchor_params):
         image       = generator.load_image(i)
         annotations = generator.load_annotations(i)
 
-        
-        
+        print(annotations)        
+        print(image)
 
         if len(annotations['labels']) > 0 :
             # apply random transformations
