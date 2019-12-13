@@ -412,7 +412,7 @@ def create_generators(args, preprocess_image):
             **common_args
         )
     elif args.dataset_type == 'synthia_set':
-        train_generator = GTAVSetGenerator(
+        train_generator = SynthiaSetGenerator(
             args.base_dir,
             set_file=args.set_file_training,
             matching=args.matching,
@@ -422,7 +422,7 @@ def create_generators(args, preprocess_image):
             **common_args
         )
 
-        validation_generator = BDD100KSetGenerator(
+        validation_generator = SynthiaSetGenerator(
             args.base_dir,
             set_file=args.set_file_validation,
             matching=args.matching,
