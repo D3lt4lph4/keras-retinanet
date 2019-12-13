@@ -105,7 +105,6 @@ class BDD100KGenerator(Generator):
             self.images.append(image_fp)
 
             # Extract label information from the data
-            print(fn)
             image_data = images_labels[fn]
 
             boxes = []

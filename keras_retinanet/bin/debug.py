@@ -278,9 +278,6 @@ def run(generator, args, anchor_params):
         image       = generator.load_image(i)
         annotations = generator.load_annotations(i)
 
-        print(annotations)        
-        print(image)
-
         if len(annotations['labels']) > 0 :
             # apply random transformations
             if args.random_transform:

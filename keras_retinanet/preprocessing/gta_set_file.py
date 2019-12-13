@@ -183,10 +183,8 @@ class GTAVSetGenerator(Generator):
                 else:
                     continue
             self.image_data[i] = boxes
-        
-        print(len(self.image_data))
 
-        print("Found {} images in the {} set.".format(len(self.images), subset))
+        print("Found {} images in the {} set.".format(len(self.images), set_file))
         super(GTAVSetGenerator, self).__init__(**kwargs)
 
     def size(self):
@@ -229,7 +227,6 @@ class GTAVSetGenerator(Generator):
     def load_image(self, image_index):
         """ Load an image at the image_index.
         """
-        print(self.images[image_index])
         return read_image_bgr(self.images[image_index])
 
     def load_annotations(self, image_index):
