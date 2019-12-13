@@ -156,7 +156,6 @@ class SynthiaSetGenerator(Generator):
                     continue
             self.image_data[i] = boxes
         
-        print(len(self.image_data))
 
         print("Found {} images in the {} set.".format(len(self.images), subset))
         super(SynthiaSetGenerator, self).__init__(**kwargs)
@@ -201,7 +200,6 @@ class SynthiaSetGenerator(Generator):
     def load_image(self, image_index):
         """ Load an image at the image_index.
         """
-        print(self.images[image_index])
         return read_image_bgr(self.images[image_index])
 
     def load_annotations(self, image_index):
