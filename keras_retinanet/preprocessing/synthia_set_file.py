@@ -134,7 +134,8 @@ class SynthiaSetGenerator(Generator):
         self.images = []
 
         for i, fn in enumerate(image_labels):
-            image_fp = os.path.join(image_dir, fn.replace(".png", "_fake.png"))
+            if not (subset == "gen"):
+                image_fp = os.path.join(image_dir, fn.replace(".png", "_fake.png"))
 
             self.images.append(image_fp)
 
